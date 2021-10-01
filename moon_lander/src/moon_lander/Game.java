@@ -1,6 +1,6 @@
 package moon_lander;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -9,6 +9,8 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+
+
 
 /**
  * Actual game.
@@ -30,6 +32,9 @@ public class Game {
     
     
     //private obstacles obstacles;
+    private final static int NUMBER_OF_OBSTACLE = 10;
+   
+    private obstacles obstacle[] = new obstacles[NUMBER_OF_OBSTACLE];
     
     /**
      * Game background image.
@@ -69,6 +74,9 @@ public class Game {
     {
         playerRocket = new PlayerRocket();
         landingArea  = new LandingArea();
+        for (int i = 0; i < NUMBER_OF_OBSTACLE; i++) {
+            obstacle[i] = new obstacles();
+        }
     }
     
     /**
@@ -84,7 +92,8 @@ public class Game {
             URL redBorderImgUrl = this.getClass().getResource("/resources/images/red_border.png");
             redBorderImg = ImageIO.read(redBorderImgUrl);
         }
-        catch (IOException ex) {
+        catch (IOException ex) 
+        {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -96,6 +105,8 @@ public class Game {
     public void RestartGame()
     {
         playerRocket.ResetPlayer();
+        for (int i = 0; i < NUMBER_OF_OBSTACLE; i++)
+            obstacle[i].resetObstacles();
     }
     
     
@@ -109,7 +120,25 @@ public class Game {
     {
         // Move the rocket
         playerRocket.Update();
+        
+        //obstacle
+        for (int i = 0; i < NUMBER_OF_OBSTACLE; i++) {
+            obstacle[i].Update();
 
+            if (playerRocket.x < obstacle[i].x + obstacle[i].obstacleImgWidth &&
+                    playerRocket.x + playerRocket.rocketImgWidth > obstacle[i].x &&
+                    playerRocket.y < obstacle[i].y + obstacle[i].obstacleImgHeight &&
+                    playerRocket.rocketImgHeight + playerRocket.y > obstacle[i].y) 
+            {
+                //collision = true
+                playerRocket.crashed = true;
+                obstacle[i].resetObstacles();
+                Framework.gameState = Framework.GameState.GAMEOVER;
+            }
+            if (obstacle[i].y + obstacle[i].obstacleImgHeight - 10 > landingArea.y) 
+            {
+                obstacle[i].crashed = true;
+            }
 	    //임시로 x,y축 제한 추가
 	  	if(playerRocket.y + playerRocket.rocketImgHeight < 0 || playerRocket.x + playerRocket.rocketImgWidth <(int)(Framework.frameWidth * 0) || playerRocket.x >(int)(Framework.frameWidth * 1))
 	  	{
@@ -139,6 +168,7 @@ public class Game {
                 
             Framework.gameState = Framework.GameState.GAMEOVER;
         }
+        }
     
     
       
@@ -158,6 +188,11 @@ public class Game {
         landingArea.Draw(g2d);
         
         playerRocket.Draw(g2d);
+        
+        for (int i = 0; i < NUMBER_OF_OBSTACLE; i++) {
+            obstacle[i].Draw(g2d);
+            
+        }
     }
     
     

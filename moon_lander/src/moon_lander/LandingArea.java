@@ -48,7 +48,7 @@ public class LandingArea {
         // X coordinate of the landing area is at 46% frame width.
         x = (int)(Framework.frameWidth * 0.46);
         // Y coordinate of the landing area is at 86% frame height.
-        y = (int)(Framework.frameHeight * 0.88);
+        y = (int)(Framework.frameHeight * 0.86);
     }
     
     private void LoadContent()
